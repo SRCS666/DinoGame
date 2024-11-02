@@ -21,9 +21,15 @@ public class GameManager : MonoBehaviour
     private Spawner spawner;
 
     [SerializeField]
+    private TextMeshProUGUI scoreText;
+    [SerializeField]
+    private TextMeshProUGUI hiscoreText;
+    [SerializeField]
     private TextMeshProUGUI gameOverText;
     [SerializeField]
     private Button retryButton;
+
+    private float score;
 
     private void Awake()
     {
@@ -39,12 +45,15 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        UpdateHiscore();
         NewGame();
     }
 
     private void Update()
     {
         GameSpeed += gameSpeedIncrease * Time.deltaTime;
+        score += GameSpeed * Time.deltaTime;
+        scoreText.text = Mathf.RoundToInt(score).ToString("D5");
     }
 
     private void OnDestroy()
@@ -66,6 +75,7 @@ public class GameManager : MonoBehaviour
         }
 
         GameSpeed = initialGameSpeed;
+        score = 0f;
         enabled = true;
 
         player.gameObject.SetActive(true);
@@ -85,5 +95,20 @@ public class GameManager : MonoBehaviour
 
         gameOverText.gameObject.SetActive(true);
         retryButton.gameObject.SetActive(true);
+
+        UpdateHiscore();
+    }
+
+    private void UpdateHiscore()
+    {
+        float hiscore = PlayerPrefs.GetFloat("hiscore", 0f);
+
+        if (score > hiscore)
+        {
+            hiscore = score;
+            PlayerPrefs.SetFloat("hiscore", hiscore);
+        }
+
+        hiscoreText.text = Mathf.RoundToInt(hiscore).ToString("D5");
     }
 }
